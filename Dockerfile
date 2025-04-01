@@ -1,6 +1,9 @@
+ARG DEBIAN_REGISTRY=docker.io
+ARG DEBIAN_REPO=library/debian
 ARG DEBIAN_RELEASE=bookworm-slim
-FROM docker.io/library/debian:${DEBIAN_RELEASE}
-LABEL org.opencontainers.image.source https://github.com/jontheniceguy/vaultwarden-sync
+FROM ${DEBIAN_REGISTRY}/${DEBIAN_REPO}:${DEBIAN_RELEASE}
+
+LABEL maintainer = "Jon Spriggs <vaultwardensync@jon.sprig.gs>"
 
 ARG APP_RELEASE=2025.1.0
 
@@ -13,7 +16,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     NOTE="# ###########################################################" \
     NOTE="# Install dependencies" \
     NOTE="# ###########################################################" \
-    apt-get install -y -q lsb-release curl unzip jq tini python3 gettext libsecret-1-0 && \
+    apt-get install -y -q lsb-release curl unzip jq python3 gettext libsecret-1-0 && \
     NOTE="# ###########################################################" \
     NOTE="# Tidy up after yourself" \
     NOTE="# ###########################################################" \
@@ -29,13 +32,10 @@ RUN addgroup --gid 1000 bwsync && \
 COPY --chmod=0755 install-bwdc-from-github.sh /usr/local/bin/
 RUN bash -x /usr/local/bin/install-bwdc-from-github.sh ${APP_RELEASE}
 
-COPY --chmod=0755 init-sync.sh /init-sync.sh
-COPY --chmod=0755 healthcheck.py /healthcheck.py
-COPY --chmod=0755 run-sync.sh /run-sync.sh
+COPY --chmod=0755 setup-sync.sh /setup-sync.sh
 
-ENV HEALTHCHECK_PORT=9999
+HEALTHCHECK --interval=300s --timeout=300s --start-period=5s --retries=3 CMD [ "/bin/sh", "-c", \
+    "until [ -e '/tmp/ready-to-go'] ; do sleep 1 ; done ; /app/bwdc sync | /usr/bin/tee /dev/termination-log" \
+]
 
-EXPOSE $HEALTHCHECK_PORT
-
-ENTRYPOINT ["/usr/bin/tini", "--"]
-CMD ["/init-sync.sh"]
+CMD ["/bin/sh", "-c", "/setup-sync.sh"]
