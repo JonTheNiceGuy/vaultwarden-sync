@@ -11,7 +11,9 @@ jobs:
   build_tag_push_to_ghcr:
     runs-on: ubuntu-latest
     permissions:
+      attestations: write
       contents: read
+      deployments: write
       packages: write
 
     steps:
