@@ -3,7 +3,7 @@ ARG DEBIAN_REPO=library/debian
 ARG DEBIAN_RELEASE=bookworm-slim
 FROM ${DEBIAN_REGISTRY}/${DEBIAN_REPO}:${DEBIAN_RELEASE}
 
-LABEL maintainer = "Jon Spriggs <vaultwardensync@jon.sprig.gs>"
+LABEL maintainer="Jon Spriggs <vaultwardensync@jon.sprig.gs>"
 
 ARG APP_RELEASE=2025.1.0
 
