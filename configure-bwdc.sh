@@ -397,12 +397,14 @@ jq  --argjson ldap      "$LDAP_JSON" \
         .[$id].directoryConfigurations.okta = $okta |
         .[$id].directoryConfigurations.oneLogin = $oneLogin |
         .[$id].directorySettings.sync = $sync |
+        .[$id].directorySettings.organizationId = $id |
         .[$id].directorySettings.directoryType = (
             if   $directory == "ldap"     then "0"
             elif $directory == "azure"    then "1"
             elif $directory == "gsuite"   then "2"
             elif $directory == "okta"     then "3"
             elif $directory == "oneLogin" then "4"
+            elif $directory == "onelogin" then "4"
             else null
             end
         )
