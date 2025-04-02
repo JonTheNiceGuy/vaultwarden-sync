@@ -18,7 +18,10 @@ then
     fi
 
     /app/bwdc logout
-    /app/bwdc login
+    until /app/bwdc login | grep "logged in"
+    do
+        sleep 5
+    done
     touch /tmp/ready-to-go
 fi
 
