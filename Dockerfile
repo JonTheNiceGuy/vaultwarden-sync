@@ -28,6 +28,8 @@ RUN addgroup --gid 1000 bwsync && \
     mkdir -p "/home/bwsync/.config/Bitwarden Directory Connector" && \
     chown -R bwsync:bwsync /home/bwsync
 
+WORKDIR /home/bwsync
+
 # Get the latest release version from GitHub API
 COPY --chmod=0755 install-bwdc-from-github.sh /usr/bin/
 RUN /usr/bin/install-bwdc-from-github.sh ${APP_RELEASE}
