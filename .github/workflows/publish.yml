@@ -2,7 +2,12 @@
 # With updated commit refs below
 name: Publish to GHCR.io
  
-on: [push]
+on:
+  push:
+    branches:
+      - '*'  # Runs on all branches
+    tags-ignore:
+      - '*'  # Ignores pushes to tags
 
 env:
   REGISTRY: ghcr.io
@@ -19,6 +24,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+        with:
+          fetch-depth: 0
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@29109295f81e9208d7d86ff1c6c12d2833863392 # v3
@@ -40,6 +47,16 @@ jobs:
           result-encoding: string
           script: return '${{ env.REGISTRY }}/${{ github.repository }}'.toLowerCase()
 
+      - name: Extract SemVer Tag
+        id: semver
+        run: |
+          TAG=$(git describe --tags --match "v*" --abbrev=0 || echo "")
+          if [[ "$TAG" =~ ^v([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+            echo "full=${TAG}" >> $GITHUB_OUTPUT
+            echo "major_minor=v${BASH_REMATCH[1]}.${BASH_REMATCH[2]}" >> $GITHUB_OUTPUT
+            echo "major=v${BASH_REMATCH[1]}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Extract Docker metadata
         id: meta
         uses: docker/metadata-action@902fa8ec7d6ecbf8d84d538b9b233a880e428804 # v5.7.0
@@ -47,11 +64,22 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           images: ${{ steps.repo_slug.outputs.result }}
           tags: |
+            # Latest tag if on default branch (main/master)
             type=raw,value=latest,enable={{is_default_branch}}
+            # Date tag in YYYYMMDD format
             type=raw,value={{date 'YYYYMMDD'}}
-            type=ref,event=tag
+            # Branch name (only for non-default branches)
             type=ref,event=branch,enable=${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master' }}
+            # Branch name with YYYYMMDD if not on default branch
+            type=raw,value={{branch}}-{{date 'YYYYMMDD'}},enable=${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master' }}
+            # Full SHA reference of the commit
             type=sha,format=long,prefix=
+            # Semver full version tag
+            type=raw,value=${{ steps.semver.outputs.full }},enable=${{ steps.semver.outputs.full != '' }}
+            # Semver major.minor version
+            type=raw,value=${{ steps.semver.outputs.major_minor }},enable=${{ steps.semver.outputs.major_minor != '' }}
+            # Semver major version
+            type=raw,value=${{ steps.semver.outputs.major }},enable=${{ steps.semver.outputs.major != '' }}
 
       - name: Build and push Docker image
         id: build-and-push
