@@ -264,7 +264,7 @@ SYNC_JSON=$(
             if $interval == "true" then true 
             elif $interval == "false" then false
             elif $interval == "null" then null
-            else $interval
+            else $interval | tonumber
             end
         ),
         removeDisabled: (
