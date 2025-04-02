@@ -16,12 +16,8 @@ fi
 
 echo "Latest version: $LATEST_VERSION"
 
-mkdir -p /app/config
-echo "$LATEST_VERSION" > /app/config/version
-
 curl -L -o /tmp/bwdc.zip "https://github.com/bitwarden/directory-connector/releases/download/v${LATEST_VERSION}/bwdc-linux-${LATEST_VERSION}.zip"
 SHA256SUM="$(sha256sum /tmp/bwdc.zip | cut -d\  -f1)"
-echo "sha256sum of bwdc is $SHA256SUM"
 
 curl -L -o /tmp/bwdc.sha256 "https://github.com/bitwarden/directory-connector/releases/download/v${LATEST_VERSION}/bwdc-linux-sha256-${LATEST_VERSION}.txt"
 
@@ -31,6 +27,6 @@ then
     exit 1
 fi
 
-unzip /tmp/bwdc.zip -d /app
+unzip /tmp/bwdc.zip -d /usr/bin
 
 echo "Download Success!"

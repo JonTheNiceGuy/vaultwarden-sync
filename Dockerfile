@@ -29,13 +29,19 @@ RUN addgroup --gid 1000 bwsync && \
     chown -R bwsync:bwsync /home/bwsync
 
 # Get the latest release version from GitHub API
-COPY --chmod=0755 install-bwdc-from-github.sh /usr/local/bin/
-RUN bash -x /usr/local/bin/install-bwdc-from-github.sh ${APP_RELEASE}
+COPY --chmod=0755 install-bwdc-from-github.sh /usr/bin/
+RUN /usr/bin/install-bwdc-from-github.sh ${APP_RELEASE}
 
-COPY --chmod=0755 setup-sync.sh /setup-sync.sh
+# Install script files
+COPY --chmod=0755 setup-sync.sh /usr/bin/setup-sync.sh
+COPY --chmod=0755 run-sync.sh /usr/bin/run-sync.sh
+COPY --chmod=0755 configure-bwdc.sh /usr/bin/configure-bwdc.sh
 
-HEALTHCHECK --interval=300s --timeout=300s --start-period=5s --retries=3 CMD [ "/bin/sh", "-c", \
-    "until [ -e '/tmp/ready-to-go'] ; do sleep 1 ; done ; /app/bwdc sync | /usr/bin/tee /dev/termination-log" \
-]
+# Setup default environment
+ENV BITWARDENCLI_CONNECTOR_PLAINTEXT_SECRETS=true
 
-CMD ["/bin/sh", "-c", "/setup-sync.sh"]
+# This is the script which should run
+HEALTHCHECK --interval=300s --timeout=300s --start-period=5s --retries=3 CMD [ "/usr/bin/run-sync.sh" ]
+
+# This performs the setup for all the files and then watches the log
+CMD ["/usr/bin/setup-sync.sh"]
