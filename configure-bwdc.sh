@@ -421,17 +421,15 @@ jq  --argjson ldap      "$LDAP_JSON" \
     --arg     directory "${DIRECTORY:-ldap}" \
     '
         .authenticatedAccounts[0] as $id |
-        (
-            .[$id].directorySettings.directoryType = (
-                if   $directory == "ldap"     then "0"
-                elif $directory == "azure"    then "1"
-                elif $directory == "gsuite"   then "2"
-                elif $directory == "okta"     then "3"
-                elif $directory == "oneLogin" then "4"
-                elif $directory == "onelogin" then "4"
-                else null
-                end
-            ) | tonumber
+        .[$id].directorySettings.directoryType = (
+            if   $directory == "ldap"     then 0
+            elif $directory == "azure"    then 1
+            elif $directory == "gsuite"   then 2
+            elif $directory == "okta"     then 3
+            elif $directory == "oneLogin" then 4
+            elif $directory == "onelogin" then 4
+            else null
+            end
         ) |
         .[$id].directoryConfigurations.ldap = $ldap |
         .[$id].directoryConfigurations.gsuite = $gsuite |
