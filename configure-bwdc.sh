@@ -96,6 +96,11 @@ LDAP_JSON=$(
     }'
 )
 
+if ! grep -q -E ': [tf"]' <<<"$LDAP_JSON"
+then
+    LDAP_JSON="{}"
+fi
+
 GSUITE_JSON=$(
     jq -n \
     --arg privateKey "${GSUITE_privateKey:-null}" \
@@ -133,6 +138,11 @@ GSUITE_JSON=$(
         )
     }'
 )
+
+if ! grep -q -E ': [tf"]' <<<"$GSUITE_JSON"
+then
+    GSUITE_JSON="{}"
+fi
 
 AZURE_JSON=$(
     jq -n \
@@ -172,6 +182,11 @@ AZURE_JSON=$(
     }'
 )
 
+if ! grep -q -E ': [tf"]' <<<"$AZURE_JSON"
+then
+    AZURE_JSON="{}"
+fi
+
 OKTA_JSON=$(
     jq -n \
     --arg orgUrl "${OKTA_orgUrl:-null}" \
@@ -193,6 +208,11 @@ OKTA_JSON=$(
         )
     }'
 )
+
+if ! grep -q -E ': [tf"]' <<<"$OKTA_JSON"
+then
+    OKTA_JSON="{}"
+fi
 
 ONELOGIN_JSON=$(
     jq -n \
@@ -223,6 +243,11 @@ ONELOGIN_JSON=$(
         )
     }'
 )
+
+if ! grep -q -E ': [tf"]' <<<"$ONELOGIN_JSON"
+then
+    ONELOGIN_JSON="{}"
+fi
 
 SYNC_JSON=$(
     jq -n \
@@ -382,6 +407,11 @@ SYNC_JSON=$(
     }'   
 )
 
+if ! grep -q -E ': [tf"]' <<<"$SYNC_JSON"
+then
+    SYNC_JSON="{}"
+fi
+
 jq  --argjson ldap      "$LDAP_JSON" \
     --argjson gsuite    "$GSUITE_JSON" \
     --argjson azure     "$AZURE_JSON" \
@@ -391,23 +421,25 @@ jq  --argjson ldap      "$LDAP_JSON" \
     --arg     directory "${DIRECTORY:-ldap}" \
     '
         .authenticatedAccounts[0] as $id |
+        (
+            .[$id].directorySettings.directoryType = (
+                if   $directory == "ldap"     then "0"
+                elif $directory == "azure"    then "1"
+                elif $directory == "gsuite"   then "2"
+                elif $directory == "okta"     then "3"
+                elif $directory == "oneLogin" then "4"
+                elif $directory == "onelogin" then "4"
+                else null
+                end
+            ) | tonumber
+        ) |
         .[$id].directoryConfigurations.ldap = $ldap |
         .[$id].directoryConfigurations.gsuite = $gsuite |
         .[$id].directoryConfigurations.azure = $azure |
         .[$id].directoryConfigurations.okta = $okta |
         .[$id].directoryConfigurations.oneLogin = $oneLogin |
         .[$id].directorySettings.sync = $sync |
-        .[$id].directorySettings.organizationId = $id |
-        .[$id].directorySettings.directoryType = (
-            if   $directory == "ldap"     then "0"
-            elif $directory == "azure"    then "1"
-            elif $directory == "gsuite"   then "2"
-            elif $directory == "okta"     then "3"
-            elif $directory == "oneLogin" then "4"
-            elif $directory == "onelogin" then "4"
-            else null
-            end
-        )
+        .[$id].directorySettings.organizationId = $id
     ' \
     "$1" > "$TEMPFILE"
 
