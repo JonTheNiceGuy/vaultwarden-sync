@@ -24,7 +24,7 @@ do
     sleep 1
 done
 
-if [ "${LDAP_cert:-null}" != "null" ] && [ "${LDAP_key:-null}" != "null" ] && [ "${LDAP_hostname:-null}" != "null" ]
+if [ -e "/home/bwsync/.config/stunnel.conf" ]
 then
     echo "Starting stunnel"
     PID_FILE=/tmp/stunnel.pid
