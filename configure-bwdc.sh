@@ -17,6 +17,7 @@ then
         "/home/bwsync/.config/ldap-client.key" > "/home/bwsync/.config/stunnel.conf"
     base64 -d <<<"${LDAP_cert}" > "/home/bwsync/.config/ldap-client.crt"
     base64 -d <<<"${LDAP_key}" > "/home/bwsync/.config/ldap-client.key"
+    chmod 600 "/home/bwsync/.config/ldap-client.crt" "/home/bwsync/.config/ldap-client.key"
     LDAP_hostname=127.0.0.1
     LDAP_port=1636
     LDAP_ssl=false
