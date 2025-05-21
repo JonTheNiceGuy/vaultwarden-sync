@@ -16,7 +16,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     NOTE="# ###########################################################" \
     NOTE="# Install dependencies" \
     NOTE="# ###########################################################" \
-    apt-get install -y -q lsb-release curl unzip jq python3 gettext libsecret-1-0 && \
+    apt-get install -y -q lsb-release curl unzip jq python3 gettext libsecret-1-0 stunnel4 && \
     NOTE="# ###########################################################" \
     NOTE="# Tidy up after yourself" \
     NOTE="# ###########################################################" \

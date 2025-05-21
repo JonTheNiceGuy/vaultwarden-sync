@@ -42,17 +42,21 @@ You should set `DIRECTORY` to the type of directory you intend to use.
 
 ### LDAP (`DIRECTORY`: `ldap`. Default if not defined)
 
-* `LDAP_ssl`
-* `LDAP_startTls`
-* `LDAP_sslAllowUnauthorized`
-* `LDAP_port`
-* `LDAP_currentUser`
-* `LDAP_ad`
-* `LDAP_pagedSearch`
-* `LDAP_username`
-* `LDAP_password`
-* `LDAP_hostname`
-* `LDAP_rootPath`
+* `LDAP_ssl` or `LDAP_startTls` (true for one of these, false for both if not defined)
+* `LDAP_sslAllowUnauthorized` (true or false)
+* `LDAP_port` (TCP port to use)
+* `LDAP_currentUser` (true or false)
+* `LDAP_ad` (true or false)
+* `LDAP_pagedSearch` (true or false)
+* `LDAP_username` (Full CN of the user to authenticate with, e.g. `CN=ldap_service@example.org,OU=users,DC=example,DC=org`)
+* `LDAP_password` (Password string)
+* `LDAP_hostname` (DNS name or IP address)
+* `LDAP_rootPath` (The path to start LDAP searches, e.g. `DC=example,DC=org`)
+
+If you need to use stunnel to contact the LDAP service, also set these two values
+
+* `LDAP_cert` (base64 encoded certificate file in PEM format)
+* `LDAP_key` (base64 encoded private key in PEM format)
 
 ### Google Suite (`DIRECTORY`: `gsuite`)
 

@@ -8,6 +8,21 @@ fi
 
 TEMPFILE="$(mktemp)"
 
+if [ "${LDAP_cert:-null}" != "null" ] && [ "${LDAP_key:-null}" != "null" ] && [ "${LDAP_hostname:-null}" != "null" ]
+then
+    printf "[ldap]\nclient = yes\naccept = 127.0.0.1:1636\nconnect = %s:%s\ncert = %s\nkey = %s" \
+        "${LDAP_hostname}" \
+        "${LDAP_port:-389}" \
+        "/home/bwsync/.config/ldap-client.crt" \
+        "/home/bwsync/.config/ldap-client.key" > "/home/bwsync/.config/stunnel.conf"
+    base64 -d <<<"${LDAP_cert}" > "/home/bwsync/.config/ldap-client.crt"
+    base64 -d <<<"${LDAP_key}" > "/home/bwsync/.config/ldap-client.key"
+    LDAP_hostname=127.0.0.1
+    LDAP_port=1636
+    LDAP_ssl=false
+    LDAP_startTls=false
+fi
+
 LDAP_JSON=$(
     jq -n \
     --arg ssl "${LDAP_ssl:-false}" \
