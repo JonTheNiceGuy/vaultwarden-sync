@@ -10,7 +10,7 @@ TEMPFILE="$(mktemp)"
 
 if [ "${LDAP_cert:-null}" != "null" ] && [ "${LDAP_key:-null}" != "null" ] && [ "${LDAP_hostname:-null}" != "null" ]
 then
-    printf "[ldap]\nclient = yes\naccept = 127.0.0.1:1636\nconnect = %s:%s\ncert = %s\nkey = %s" \
+    printf "foreground = yes\npid = /tmp/stunnel.pid\ndebug = err\n\n[ldap]\nclient = yes\naccept = 127.0.0.1:1636\nconnect = %s:%s\ncert = %s\nkey = %s" \
         "${LDAP_hostname}" \
         "${LDAP_port:-389}" \
         "/home/bwsync/.config/ldap-client.crt" \

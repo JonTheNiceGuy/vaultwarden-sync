@@ -28,7 +28,7 @@ if [ "${LDAP_cert:-null}" != "null" ] && [ "${LDAP_key:-null}" != "null" ] && [ 
 then
     echo "Starting stunnel"
     PID_FILE=/tmp/stunnel.pid
-    stunnel4 "/home/bwsync/.config/stunnel.conf" --pid $PID_FILE &
+    stunnel4 "/home/bwsync/.config/stunnel.conf" &
 fi
 
 /usr/bin/bwdc sync | /usr/bin/tee -a /dev/termination-log
