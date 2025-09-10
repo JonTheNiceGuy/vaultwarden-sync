@@ -487,7 +487,7 @@ SYNC_JSON=$(
 )
 
 
-if ! grep -q -E ': [tf"]' <<<"$OKTA_JSON"
+if ! grep -q -E ': [tf"]' <<<"$SYNC_JSON"
 then
     echo "====================================================="
     echo "            Sync Configuration Not Needed            "
