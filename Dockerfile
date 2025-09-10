@@ -35,15 +35,11 @@ COPY --chmod=0755 install-bwdc-from-github.sh /usr/bin/
 RUN /usr/bin/install-bwdc-from-github.sh ${APP_RELEASE}
 
 # Install script files
-COPY --chmod=0755 setup-sync.sh /usr/bin/setup-sync.sh
-COPY --chmod=0755 run-sync.sh /usr/bin/run-sync.sh
+COPY --chmod=0755 setup-sync.sh /usr/bin/run-all.sh
 COPY --chmod=0755 configure-bwdc.sh /usr/bin/configure-bwdc.sh
 
 # Setup default environment
 ENV BITWARDENCLI_CONNECTOR_PLAINTEXT_SECRETS=true
 
-# This is the script which should run
-HEALTHCHECK --interval=300s --timeout=300s --start-period=5s --retries=3 CMD [ "/usr/bin/run-sync.sh" ]
-
-# This performs the setup for all the files and then watches the log
-CMD ["/usr/bin/setup-sync.sh"]
+# This should be run as a cronjob due to unreliability from the underlying library
+CMD ["/usr/bin/run-all.sh"]
