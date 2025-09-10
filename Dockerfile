@@ -35,7 +35,7 @@ COPY --chmod=0755 install-bwdc-from-github.sh /usr/bin/
 RUN /usr/bin/install-bwdc-from-github.sh ${APP_RELEASE}
 
 # Install script files
-COPY --chmod=0755 setup-sync.sh /usr/bin/run-all.sh
+COPY --chmod=0755 run-all.sh /usr/bin/run-all.sh
 COPY --chmod=0755 configure-bwdc.sh /usr/bin/configure-bwdc.sh
 
 # Setup default environment

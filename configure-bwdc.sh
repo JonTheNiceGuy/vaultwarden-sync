@@ -8,8 +8,14 @@ fi
 
 TEMPFILE="$(mktemp)"
 
+echo "====================================================="
+echo "        Checking whether to configure STunnel        "
+echo "====================================================="
 if [ "${LDAP_cert:-null}" != "null" ] && [ "${LDAP_key:-null}" != "null" ] && [ "${LDAP_hostname:-null}" != "null" ]
 then
+    echo "====================================================="
+    echo "                 Configuring STunnel                 "
+    echo "====================================================="
     printf "foreground = yes\npid = /tmp/stunnel.pid\ndebug = err\n\n[ldap]\nclient = yes\naccept = 127.0.0.1:1636\nconnect = %s:%s\ncert = %s\nkey = %s\n" \
         "${LDAP_hostname}" \
         "${LDAP_port:-389}" \
@@ -22,8 +28,15 @@ then
     LDAP_port=1636
     LDAP_ssl=false
     LDAP_startTls=false
+else
+    echo "====================================================="
+    echo "                STunnel Not Required                 "
+    echo "====================================================="
 fi
 
+echo "====================================================="
+echo "             Checking LDAP Configuration             "
+echo "====================================================="
 LDAP_JSON=$(
     jq -n \
     --arg ssl "${LDAP_ssl:-false}" \
@@ -114,9 +127,19 @@ LDAP_JSON=$(
 
 if ! grep -q -E ': [tf"]' <<<"$LDAP_JSON"
 then
+    echo "====================================================="
+    echo "            LDAP Configuration Not Needed            "
+    echo "====================================================="
     LDAP_JSON="{}"
+else
+    echo "====================================================="
+    echo "             Configuring BWSync for LDAP             "
+    echo "====================================================="
 fi
 
+echo "====================================================="
+echo "            Checking GSuite Configuration            "
+echo "====================================================="
 GSUITE_JSON=$(
     jq -n \
     --arg privateKey "${GSUITE_privateKey:-null}" \
@@ -157,9 +180,19 @@ GSUITE_JSON=$(
 
 if ! grep -q -E ': [tf"]' <<<"$GSUITE_JSON"
 then
+    echo "====================================================="
+    echo "           GSuite Configuration Not Needed           "
+    echo "====================================================="
     GSUITE_JSON="{}"
+else
+    echo "====================================================="
+    echo "            Configuring BWSync for GSuite            "
+    echo "====================================================="
 fi
 
+echo "====================================================="
+echo "             Checking Azure Configuration            "
+echo "====================================================="
 AZURE_JSON=$(
     jq -n \
     --arg privateKey "${AZURE_privateKey:-null}" \
@@ -200,9 +233,19 @@ AZURE_JSON=$(
 
 if ! grep -q -E ': [tf"]' <<<"$AZURE_JSON"
 then
+    echo "====================================================="
+    echo "            Azure Configuration Not Needed           "
+    echo "====================================================="
     AZURE_JSON="{}"
+else
+    echo "====================================================="
+    echo "             Configuring BWSync for Azure            "
+    echo "====================================================="
 fi
 
+echo "====================================================="
+echo "             Checking Okta Configuration             "
+echo "====================================================="
 OKTA_JSON=$(
     jq -n \
     --arg orgUrl "${OKTA_orgUrl:-null}" \
@@ -227,9 +270,19 @@ OKTA_JSON=$(
 
 if ! grep -q -E ': [tf"]' <<<"$OKTA_JSON"
 then
+    echo "====================================================="
+    echo "            Okta Configuration Not Needed            "
+    echo "====================================================="
     OKTA_JSON="{}"
+else
+    echo "====================================================="
+    echo "             Configuring BWSync for Okta             "
+    echo "====================================================="
 fi
 
+echo "====================================================="
+echo "           Checking OneLogin Configuration           "
+echo "====================================================="
 ONELOGIN_JSON=$(
     jq -n \
     --arg region "${ONELOGIN_region:-null}" \
@@ -262,9 +315,19 @@ ONELOGIN_JSON=$(
 
 if ! grep -q -E ': [tf"]' <<<"$ONELOGIN_JSON"
 then
+    echo "====================================================="
+    echo "          OneLogin Configuration Not Needed          "
+    echo "====================================================="
     ONELOGIN_JSON="{}"
+else
+    echo "====================================================="
+    echo "           Configuring BWSync for OneLogin           "
+    echo "====================================================="
 fi
 
+echo "====================================================="
+echo "             Checking Sync Configuration             "
+echo "====================================================="
 SYNC_JSON=$(
     jq -n \
     --arg users "${SYNC_users:-null}" \
@@ -423,9 +486,17 @@ SYNC_JSON=$(
     }'   
 )
 
-if ! grep -q -E ': [tf"]' <<<"$SYNC_JSON"
+
+if ! grep -q -E ': [tf"]' <<<"$OKTA_JSON"
 then
+    echo "====================================================="
+    echo "            Sync Configuration Not Needed            "
+    echo "====================================================="
     SYNC_JSON="{}"
+else
+    echo "====================================================="
+    echo "             Configuring BWSync for Sync             "
+    echo "====================================================="
 fi
 
 jq  --argjson ldap      "$LDAP_JSON" \
@@ -457,4 +528,8 @@ jq  --argjson ldap      "$LDAP_JSON" \
     ' \
     "$1" > "$TEMPFILE"
 
+
+echo "====================================================="
+echo "               Configuration Complete                "
+echo "====================================================="
 mv "$TEMPFILE" "$1"
